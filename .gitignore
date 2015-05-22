@@ -1,0 +1,8 @@
+# Ignore node modules
+node_modules
+
+# Ignore data sets folder
+data_sets
+
+# Ignore assets folder
+assets
