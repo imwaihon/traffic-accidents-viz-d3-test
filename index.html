@@ -5,6 +5,7 @@
   <link rel="stylesheet" type="text/css" href="assets/lib/bootstrap/dist/css/bootstrap.min.css" />
   <link rel="stylesheet" type="text/css" href="assets/css/keen-dashboards.css" />
   <link rel="stylesheet" type="text/css" href="main.css" />
+  <link href="//cdnjs.cloudflare.com/ajax/libs/dc/1.6.0/dc.css" rel="stylesheet">
 
   <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 
@@ -45,13 +46,12 @@
           <div class="col-sm-12">
             <div class="chart-wrapper">
               <div class="chart-title">
-                Violations: Hourly Average
+                Accidents For Each Month
               </div>
               <div class="chart-stage">
-                <div id="chart-01"></div>
+                <div id="AcciMonth"></div>
               </div>
               <div class="chart-notes">
-                This is a sample text region to describe this chart.
               </div>
             </div>
           </div>
@@ -60,31 +60,10 @@
           <div class="col-sm-12">
             <div class="chart-wrapper">
               <div class="chart-title">
-                Hourly actions
-                <small class="pull-right">
-                  <label class="pull-left" style="margin-right: 10px;">
-                    Street:
-                    <select>
-                      <option>All blocks</option>
-                      <option>Howard</option>
-                      <option selected>Folsom</option>
-                      <option>Harrison</option>
-                    </select>
-                  </label>
-                  <label>
-                    Block:
-                    <select>
-                      <option>All blocks</option>
-                      <option>900</option>
-                      <option selected>800</option>
-                      <option>700</option>
-                      <option>500</option>
-                    </select>
-                  </label>
-                </small>
+                Accidents For Each Hour
               </div>
               <div class="chart-stage">
-                <div id="chart-03"></div>
+                <div id="AcciHour"></div>
               </div>
               <div class="chart-notes">
                 Notes go down here
@@ -162,7 +141,10 @@
   <!-- D3 -->
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
+  <script src="http://cdnjs.cloudflare.com/ajax/libs/dc/1.7.0/dc.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js"></script>
   <script type="text/javascript" src="visuals.js"></script>
+
  
 
   <!-- UI Resources -->

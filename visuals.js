@@ -1,4 +1,6 @@
-d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, dataset) {
+
+
+d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
 
     // Reformat the data set (should eventually be done independently before processing)
     function reformat(array) {
@@ -17,7 +19,8 @@ d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, datase
                     time: d.TIME,
                     street: d["ON STREET NAME"],
                     injuries: d["NUMBER OF PERSONS INJURED"],
-                    killed: d["NUMBER OF PERSONS KILLED"]
+                    killed: d["NUMBER OF PERSONS KILLED"],
+                    factor: d["CONTRIBUTING FACTOR VEHICLE 1"]
 
                 });
             }
@@ -318,6 +321,7 @@ d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, datase
     slider
       .call(brush.event)
 
+    // Update event
     function brushed() {
       var value = brush.extent()[0];
 
@@ -325,10 +329,88 @@ d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, datase
         value = timeScale.invert(d3.mouse(this)[0]);
         brush.extent([value, value]);
       }
-      console.log("lol")
+
       handle.attr("transform", "translate(" + timeScale(value) + ",0)");
       handle.select('text').text(formatDate(value));
     }
+
+
+
+    /*---------- BAR CHARTS ----------*/
+
+    var barAcciMonth = dc.barChart("#AcciMonth");
+    var barAcciHour = dc.barChart("#AcciHour");
+    var ndx = crossfilter(dataset);
+
+    // Dimensions
+    var monthDim = ndx.dimension(function(d){
+        return d["MONTH"];
+    });
+    var hourDim = ndx.dimension(function(d) {
+        return d["HOUR"]
+    });
+    var latitudeDim = ndx.dimension(function(d){
+        return d["LATITUDE"];
+    });
+    var longitudeDim = ndx.dimension(function(d){
+        return d["LONGITUDE"]
+    });
+
+
+    // Aggregate Data
+    var acciMonth = monthDim.group().reduceCount();
+    var acciHour = hourDim.group().reduceCount();
+
+    // Measures and Colours
+    var marginMt = {
+        "top": 10,
+        "right": 10,
+        "left": 30,
+        "bottom": 20
+    };
+
+
+    // Rendering
+    barAcciMonth
+    .width(800)
+    .height(150)
+    .margins(marginMt)
+    .dimension(monthDim)
+    .group(acciMonth)
+    .x(d3.scale.ordinal()
+    .domain(d3.range(1, 13)))
+    .xUnits(dc.units.ordinal)
+    .elasticY(true)
+    .yAxis()
+    .ticks(4);
+
+    barAcciHour
+    .width(800)
+    .height(150)
+    .margins(marginMt)
+    .dimension(hourDim)
+    .group(acciHour)
+    .x(d3.scale.ordinal()
+    .domain(d3.range(1, 25)))
+    .xUnits(dc.units.ordinal)
+    .elasticY(true)
+    .yAxis()
+    .ticks(4);
+
+    dc.renderAll();
+
+    function addXAxis(chartToUpdate, displayText) {
+        chartToUpdate.svg()
+                    .append("text")
+                    .attr("class", "x-axis-label")
+                    .attr("text-anchor", "middle")
+                    .attr("x", chartToUpdate.width()/2)
+                    .attr("y", chartToUpdate.height()-3.5)
+                    .text(displayText);
+    }
+
+    addXAxis(barAcciMonth, "Month");
+
 
 
 });
