@@ -25,6 +25,9 @@ d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, datase
         return data;
     }
 
+
+    /*---------- MAP ----------*/
+
     /*
     
     A quadtree is a two-dimensional recursive spatial subdivision. This implementation uses square partitions, 
@@ -139,32 +142,32 @@ d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, datase
     }
 
     function redrawSubset(subset) {
-        path.pointRadius(3);// * scale);
+        mapPath.pointRadius(3);// * scale);
 
-        var bounds = path.bounds({ type: "FeatureCollection", features: subset });
+        var bounds = mapPath.bounds({ type: "FeatureCollection", features: subset });
         var topLeft = bounds[0];
         var bottomRight = bounds[1];
 
 
-        svg.attr("width", bottomRight[0] - topLeft[0])
+        mapSvg.attr("width", bottomRight[0] - topLeft[0])
           .attr("height", bottomRight[1] - topLeft[1])
           .style("left", topLeft[0] + "px")
           .style("top", topLeft[1] + "px");
 
 
-        g.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
+        mapG.attr("transform", "translate(" + -topLeft[0] + "," + -topLeft[1] + ")");
 
         var start = new Date();
 
         var tip = d3.tip().attr('class', 'd3-tip').html(function(d) { return JSON.stringify(d); });
-        var points = g.selectAll("path")
+        var points = mapG.selectAll("path")
                       .data(subset, function (d) {
                           return d.id;
                       });
         
         points.enter().append("path");
         points.exit().remove();
-        points.attr("d", path);
+        points.attr("d", mapPath);
         points.call(tip)
         points.on('mouseover', tip.show)
         points.on('mouseout', tip.hide)
@@ -188,14 +191,8 @@ d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, datase
 
     }
 
-
-    /* Pipeline */
-
-
     // Data set loaded
     var geoData = { type: "FeatureCollection", features: reformat(dataset) };
-
-    console.log(geoData)
 
     // Using quadtree to reduce number of points shown
     var qtree = d3.geom.quadtree(geoData.features.map(function (data, i) {
@@ -216,11 +213,11 @@ d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, datase
 
 
     // SVG object in leaflet map pane
-    var svg = d3.select(leafletMap.getPanes().overlayPane).append("svg");
-    var g = svg.append("g").attr("class", "leaflet-zoom-hide");
+    var mapSvg = d3.select(leafletMap.getPanes().overlayPane).append("svg");
+    var mapG = mapSvg.append("g").attr("class", "leaflet-zoom-hide");
 
-    var transform = d3.geo.transform({ point: projectPoint });
-    var path = d3.geo.path().projection(transform);
+    var mapTransform = d3.geo.transform({ point: projectPoint });
+    var mapPath = d3.geo.path().projection(mapTransform);
 
     updateNodes(qtree);
 
@@ -230,6 +227,108 @@ d3.csv('../data_sets/NYPD_Motor_Vehicle_Collisions.csv', function (error, datase
     // Update
     mapmove();
 
+
+
+
+
+    /*---------- SLIDER ----------*/
+
+    formatDate = d3.time.format("%b %d");
+
+    // parameters
+    var margin = {
+        top: 50,
+        right: 50,
+        bottom: 50,
+        left: 50
+    }
+
+    var width = 960 - margin.left - margin.right;
+    var height = 300 - margin.bottom - margin.top;
+
+
+    // scale function
+    var timeScale = d3.time.scale()
+      .domain([new Date('2012-01-02'), new Date('2013-01-01')])
+      .range([0, width])
+      .clamp(true);
+
+
+    // initial value
+    var startValue = timeScale(new Date('2012-03-20'));
+    startingValue = new Date('2012-03-20');
+
+    //////////
+
+    // defines brush
+    var brush = d3.svg.brush()
+      .x(timeScale)
+      .extent([startingValue, startingValue])
+      .on("brush", brushed);
+
+    var svg = d3.select("#slider-bar").append("svg")
+      .attr("width", width + margin.left + margin.right)
+      .attr("height", height + margin.top + margin.bottom)
+      .append("g")
+      // classic transform to position g
+      .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    svg.append("g")
+      .attr("class", "x axis")
+    // put in middle of screen
+      .attr("transform", "translate(0," + height / 2 + ")")
+    // inroduce axis
+    .call(d3.svg.axis()
+      .scale(timeScale)
+      .orient("bottom")
+      .tickFormat(function(d) {
+        return formatDate(d);
+      })
+      .tickSize(0)
+      .tickPadding(12)
+      .tickValues([timeScale.domain()[0], timeScale.domain()[1]]))
+      .select(".domain")
+      .select(function() {
+        console.log(this);
+        return this.parentNode.appendChild(this.cloneNode(true));
+      })
+      .attr("class", "halo");
+
+    var slider = svg.append("g")
+      .attr("class", "slider")
+      .call(brush);
+
+    slider.selectAll(".extent,.resize")
+      .remove();
+
+    slider.select(".background")
+      .attr("height", height);
+
+    var handle = slider.append("g")
+      .attr("class", "handle")
+
+    handle.append("path")
+      .attr("transform", "translate(0," + height / 2 + ")")
+      .attr("d", "M 0 -20 V 20")
+
+    handle.append('text')
+      .text(startingValue)
+      .attr("transform", "translate(" + (-18) + " ," + (height / 2 - 25) + ")");
+
+    slider
+      .call(brush.event)
+
+    function brushed() {
+      var value = brush.extent()[0];
+
+      if (d3.event.sourceEvent) { // not a programmatic event
+        value = timeScale.invert(d3.mouse(this)[0]);
+        brush.extent([value, value]);
+      }
+      console.log("lol")
+      handle.attr("transform", "translate(" + timeScale(value) + ",0)");
+      handle.select('text').text(formatDate(value));
+    }
 
 
 });
