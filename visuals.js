@@ -17,6 +17,8 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
                     },
                     date: d.DATE,
                     time: d.TIME,
+                    month: +d.MONTH,
+                    hour: +d.HOUR,
                     street: d["ON STREET NAME"],
                     injuries: d["NUMBER OF PERSONS INJURED"],
                     killed: d["NUMBER OF PERSONS KILLED"],
@@ -191,7 +193,15 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
         console.log("subset: " + subset.length);
 
         redrawSubset(subset);
+        updateMap();
+    }
 
+    function updateMap() {
+        var points = mapG.selectAll("path")
+            .data(monthDim.top(Infinity));
+        
+        points.enter().append("path");
+        points.exit().remove();
     }
 
     // Data set loaded
@@ -223,13 +233,6 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
     var mapPath = d3.geo.path().projection(mapTransform);
 
     updateNodes(qtree);
-
-    // Update when map is moved
-    leafletMap.on('moveend', mapmove);
-
-    // Update
-    mapmove();
-
 
 
 
@@ -341,6 +344,7 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
     var barAcciMonth = dc.barChart("#AcciMonth");
     var barAcciHour = dc.barChart("#AcciHour");
     var ndx = crossfilter(dataset);
+    all = ndx.groupAll();
 
     // Dimensions
     var monthDim = ndx.dimension(function(d){
@@ -348,12 +352,6 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
     });
     var hourDim = ndx.dimension(function(d) {
         return d["HOUR"]
-    });
-    var latitudeDim = ndx.dimension(function(d){
-        return d["LATITUDE"];
-    });
-    var longitudeDim = ndx.dimension(function(d){
-        return d["LONGITUDE"]
     });
 
 
@@ -369,7 +367,6 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
         "bottom": 20
     };
 
-
     // Rendering
     barAcciMonth
     .width(800)
@@ -380,9 +377,15 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
     .x(d3.scale.ordinal()
     .domain(d3.range(1, 13)))
     .xUnits(dc.units.ordinal)
+    .xAxisLabel('Month')
     .elasticY(true)
+    .renderLabel(true)
+    .on("filtered", function(c, f){
+        return mapmove();
+    })
     .yAxis()
     .ticks(4);
+
 
     barAcciHour
     .width(800)
@@ -390,26 +393,27 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, dataset) {
     .margins(marginMt)
     .dimension(hourDim)
     .group(acciHour)
-    .x(d3.scale.ordinal()
-    .domain(d3.range(1, 25)))
-    .xUnits(dc.units.ordinal)
+    .x(d3.scale.linear()
+    .domain([0,23]))
     .elasticY(true)
+    .on("filtered", function(c, f){
+        return mapmove();
+    })
     .yAxis()
     .ticks(4);
 
+
+
+
+
+    // Exceute
     dc.renderAll();
+    // Update when map is moved
+    leafletMap.on('moveend', mapmove);
+    // Update Map
+    mapmove();
 
-    function addXAxis(chartToUpdate, displayText) {
-        chartToUpdate.svg()
-                    .append("text")
-                    .attr("class", "x-axis-label")
-                    .attr("text-anchor", "middle")
-                    .attr("x", chartToUpdate.width()/2)
-                    .attr("y", chartToUpdate.height()-3.5)
-                    .text(displayText);
-    }
 
-    addXAxis(barAcciMonth, "Month");
 
 
 
