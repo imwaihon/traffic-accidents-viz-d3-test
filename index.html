@@ -6,6 +6,7 @@
   <link rel="stylesheet" type="text/css" href="assets/css/keen-dashboards.css" />
   <link rel="stylesheet" type="text/css" href="main.css" />
   <link href="//cdnjs.cloudflare.com/ajax/libs/dc/1.6.0/dc.css" rel="stylesheet">
+  <link rel="stylesheet" src="bower_components/leaflet.markercluster/dist/MarkerCluster.css"></script>
 
   <link href='http://fonts.googleapis.com/css?family=Raleway' rel='stylesheet' type='text/css'>
 
@@ -25,14 +26,6 @@
         </button>
         <a class="navbar-brand" href="./">NYC  <small>Traffic Accidents Viz</small></a>
       </div>
-      <div class="navbar-collapse collapse">
-        <ul class="nav navbar-nav navbar-left">
-          <li><a href="https://keen.io">Home</a></li>
-          <li><a href="https://keen.io/team">Team</a></li>
-          <li><a href="https://github.com/keenlabs/dashboards/tree/gh-pages/examples/sfmta-parking">Source</a></li>
-          <li><a href="https://groups.google.com/forum/#!forum/keen-io-devs">Community</a></li><li><a href="http://stackoverflow.com/questions/tagged/keen-io?sort=newest&pageSize=15">Technical Support</a></li>
-        </ul>
-      </div>
     </div>
   </div>
 
@@ -46,27 +39,12 @@
           <div class="col-sm-12">
             <div class="chart-wrapper">
               <div class="chart-title">
-                Accidents For Each Month
-              </div>
-              <div class="chart-stage">
-                <div id="AcciMonth"></div>
-              </div>
-              <div class="chart-notes">
-              </div>
-            </div>
-          </div>
-        </div>
-        <div class="row">
-          <div class="col-sm-12">
-            <div class="chart-wrapper">
-              <div class="chart-title">
                 Accidents For Each Hour
               </div>
               <div class="chart-stage">
-                <div id="AcciHour"></div>
+                <div id="accident-hour-chart"></div>
               </div>
               <div class="chart-notes">
-                Notes go down here
               </div>
             </div>
           </div>
@@ -75,31 +53,10 @@
           <div class="col-sm-12">
             <div class="chart-wrapper">
               <div class="chart-title">
-                Actions by officer
-                <small class="pull-right">
-                  <label class="pull-left" style="margin-right: 10px;">
-                    Officer:
-                    <select>
-                      <option selected>All officers</option>
-                      <option>Kathy Kuzemka</option>
-                      <option>William Howland</option>
-                      <option>Harrison Ford</option>
-                    </select>
-                  </label>
-                  <label>
-                    Type:
-                    <select>
-                      <option>All actions</option>
-                      <option selected>Expired meter</option>
-                      <option>Time limit</option>
-                      <option>No parking zone</option>
-                      <option>Loading zone</option>
-                    </select>
-                  </label>
-                </small>
+                Cause of Accident
               </div>
               <div class="chart-stage">
-                <div id="chart-05"></div>
+                <div id="accident-cause-chart"></div>
               </div>
               <div class="chart-notes">
               </div>
@@ -107,7 +64,21 @@
           </div>
         </div>
 
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Records selected
+              </div>
+              <div class="chart-stage">
+                <div id="accident-data-count"><span class="filter-count"></span> selected out of <span class="total-count"></span> records</div>
+              </div>
+            </div>
+          </div>
+        </div>
+
       </div>
+
 
       <div class="col-sm-6" id="mapbox-panel">
         <div class="chart-wrapper">
@@ -137,13 +108,17 @@
   <!-- Leaflet -->
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
   <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
+  <script type="text/javascript" src="bower_components/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
+
+
 
   <!-- D3 -->
   <script src="http://d3js.org/d3.v3.min.js" charset="utf-8"></script>
   <script src="http://labratrevenge.com/d3-tip/javascripts/d3.tip.v0.6.3.js"></script>
   <script src="http://cdnjs.cloudflare.com/ajax/libs/dc/1.7.0/dc.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/crossfilter/1.3.11/crossfilter.min.js"></script>
-  <script type="text/javascript" src="visuals.js"></script>
+  <script type="text/javascript" src="assets/lib/dc.leaflet.js"></script>
+  <script type="text/javascript" src="dashboard.js"></script>
 
  
 

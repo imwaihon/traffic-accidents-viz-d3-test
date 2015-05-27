@@ -6,3 +6,5 @@ data_sets
 
 # Ignore assets folder
 assets
+
+bower_components
