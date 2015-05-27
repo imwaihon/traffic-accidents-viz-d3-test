@@ -91,7 +91,7 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
 
     /* Margins, Width and Height */
 
-    var C_MARGINS = {top: 20, left: 10, right: 10, bottom: 20}
+    var C_MARGINS = {top: 20, left: 50, right: 10, bottom: 20}
     var C_HEIGHT = 200
     var C_WIDTH = 800
     
@@ -106,10 +106,11 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         .valueAccessor(function (p) {
             return p.value.count;
         })
-        .x(d3.scale.linear().domain([0, 24]))
+        .x(d3.scale.linear().domain([0,24]))
         .elasticX(true)
         .elasticY(true)
-        .xAxis().ticks(4);
+        .xAxisLabel('Hour') // (optional) render an axis label below the x axis
+        .xAxis().ticks(12);
 
     /* Accident Cause Row Chart */
 
@@ -139,6 +140,13 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         .center([40.71, -74.00])
         .zoom(11)
         .cluster(true)
+        .clusterOptions({ //maxClusterRadius: 120, 
+            iconCreateFunction: function(cluster) {
+                return new L.DivIcon({ html: '<b>' + cluster.getChildCount() + '</b>' , className: 'mycluster', iconSize: L.point(30,30) });
+            }
+            //spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false
+
+        })
         .renderPopup(false)
         .filterByArea(true); 
 
