@@ -147,7 +147,7 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
             //spiderfyOnMaxZoom: false, showCoverageOnHover: false, zoomToBoundsOnClick: false
 
         })
-        .renderPopup(false)
+        .renderPopup(true)
         .filterByArea(true); 
 
     dc.renderAll(groupname);
