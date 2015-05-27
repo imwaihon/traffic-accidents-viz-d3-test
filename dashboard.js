@@ -1,9 +1,11 @@
 'use strict'
+var groupname = "dashboard" 
 
 // Create chart objects globally
-var accidentHourChart = dc.barChart('#accident-hour-chart');
-var accidentCauseChart = dc.rowChart('#accident-cause-chart');
-var accidentDataCount = dc.dataCount("#accident-data-count");
+var accidentHourChart = dc.barChart('#accident-hour-chart', groupname);
+var accidentCauseChart = dc.rowChart('#accident-cause-chart', groupname);
+var accidentDataCount = dc.dataCount("#accident-data-count", groupname);
+var accidentMap = dc.leafletMarkerChart("#map", groupname)
 
 
 
@@ -34,7 +36,7 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         return data;
     }
 
-    var dataset = reformat(raw_dataset) 
+    var dataset = reformat(raw_dataset)
 
     /* Create crossfilter dimensions and groups */
 
@@ -84,7 +86,7 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
 
     // Map Dimension
     var geoDimension = ndx.dimension(function(d) { return d.coordinates; });
-    var geoDimensionGroup = geoDimension.group().reduceCount();
+    var geoDimensionGroup = geoDimension.group();
 
 
     /* Margins, Width and Height */
@@ -106,6 +108,7 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         })
         .x(d3.scale.linear().domain([0, 24]))
         .elasticX(true)
+        .elasticY(true)
         .xAxis().ticks(4);
 
     /* Accident Cause Row Chart */
@@ -127,16 +130,19 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         .dimension(ndx)
         .group(all);
 
-    dc.leafletMarkerChart("#map")
-      .dimension(geoDimension)
-      .group(geoDimensionGroup)
-      .center([40.71, -74.00])
-      .zoom(11)
-      .locationAccessor(function (d) { return d.coordinates; })
-      .renderPopup(false)
-      .filterByArea(true); 
+    /* Accident Map */
+    accidentMap
+        .width(800)
+        .height(600)
+        .group(geoDimensionGroup)
+        .dimension(geoDimension)
+        .center([40.71, -74.00])
+        .zoom(11)
+        .cluster(true)
+        .renderPopup(false)
+        .filterByArea(true); 
 
-    dc.renderAll();
+    dc.renderAll(groupname);
 
 });
 
