@@ -3,6 +3,7 @@ var groupname = "dashboard"
 
 // Create chart objects globally
 var accidentHourChart = dc.barChart('#accident-hour-chart', groupname);
+var deathsInjuriesHourChart = dc.barChart('#deaths-injuries-hour-chart', groupname);
 var accidentCauseChart = dc.rowChart('#accident-cause-chart', groupname);
 var accidentDataCount = dc.dataCount("#accident-data-count", groupname);
 var accidentMap = dc.leafletMarkerChart("#map", groupname)
@@ -74,6 +75,10 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         }
     );
 
+
+    var killedGroup = hourDimension.group().reduceSum(function (d) { return d.killed; });
+    var injuredGroup = hourDimension.group().reduceSum(function (d) { return d.injuries; });
+
     // Create Dimension by Cause
     var causeDimension = ndx.dimension(function (d) {
         if (d.factor1 != 'Unspecified') {
@@ -93,7 +98,7 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
 
     var C_MARGINS = {top: 20, left: 50, right: 10, bottom: 20}
     var C_HEIGHT = 200
-    var C_WIDTH = 800
+    var C_WIDTH = 750
     
     /* Accident Hour Bar Chart */
 
@@ -101,8 +106,8 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         .width(C_WIDTH)
         .height(C_HEIGHT)
         .margins(C_MARGINS)
-        .group(hourDimensionGroup)
         .dimension(hourDimension)
+        .group(hourDimensionGroup)
         .valueAccessor(function (p) {
             return p.value.count;
         })
@@ -148,9 +153,49 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
 
         })
         .renderPopup(true)
-        .filterByArea(true); 
+        .filterByArea(true);
+
+
+    // var colorRenderlet = function (chart) {
+    //     chart.selectAll("rect.bar")
+    //             .on("click", function (d) {
+    //                 function setAttr(selection, keyName) {
+    //                     selection.style("fill", function (d) {
+    //                         if (d[keyName] == "killedCount") return "#63D3FF";
+    //                         else if (d[keyName] == "injuredCount") return "#FF548F";
+    //                     });
+    //                 }
+    //                 setAttr(_chart.selectAll("g.stack").selectAll("rect.bar"), "layer");
+    //                 setAttr(_chart.selectAll("g.dc-legend-item").selectAll("rect"), "name")
+    //             });
+    // };
+
+    deathsInjuriesHourChart
+        .width(C_WIDTH)
+        .height(C_HEIGHT)
+        .margins(C_MARGINS)
+        .dimension(hourDimension)
+        .group(killedGroup)
+        .x(d3.scale.linear().domain([0,24]))
+        .elasticX(true)
+        .elasticY(true)
+        //.renderlet(colorRenderlet)
+        .xAxisLabel('Hour') // (optional) render an axis label below the x axis
+        .xAxis().ticks(12);
+
+
+
+
 
     dc.renderAll(groupname);
+
+    var latlngs = []
+
+    for (var i=0; i<dataset.length; i++) {
+        latlngs.push(L.latLng(dataset[i].coordinates[0], dataset[i].coordinates[1]));
+    }
+
+    var heat = L.heatLayer(latlngs, {radius: 25}).addTo(accidentMap.map());
 
 });
 

@@ -16,6 +16,7 @@
     .dc-chart g.axis text {fill: black;}
 
     .mycluster {
+      border-radius: 15px;
       width: 30px;
       height: 30px;
       background-color: yellow;
@@ -62,6 +63,21 @@
             </div>
           </div>
         </div>
+
+        <div class="row">
+          <div class="col-sm-12">
+            <div class="chart-wrapper">
+              <div class="chart-title">
+                Death/Injured For Each Hour
+              </div>
+              <div class="chart-stage">
+                <div id="deaths-injuries-hour-chart"></div>
+              </div>
+              <div class="chart-notes">
+              </div>
+            </div>
+          </div>
+        </div>
         <div class="row">
           <div class="col-sm-12">
             <div class="chart-wrapper">
@@ -77,34 +93,40 @@
           </div>
         </div>
 
+
+      </div>
+
+      <div class="col-sm-6" id="mapbox-panel">
         <div class="row">
-          <div class="col-sm-12">
-            <div class="chart-wrapper">
-              <div class="chart-title">
-                Records selected
-              </div>
-              <div class="chart-stage">
-                <div id="accident-data-count"><span class="filter-count"></span> selected out of <span class="total-count"></span> records</div>
-              </div>
+          <div class="chart-wrapper">
+            <div class="chart-title">
+              Geo Status
+            </div>
+            <div class="chart-stage">
+              <div id="map"></div>
+            </div>
+            <div class="chart-notes">
+              
             </div>
           </div>
         </div>
 
-      </div>
-
-
-      <div class="col-sm-6" id="mapbox-panel">
-        <div class="chart-wrapper">
-          <div class="chart-title">
-            Geo Status
-          </div>
-          <div class="chart-stage">
-            <div id="map"></div>
-          </div>
-          <div class="chart-notes">
+        <div class="row">
+          <div class="chart-wrapper">
+            <div class="chart-title">
+            </div>
+            <div class="chart-stage">
+              <div id="accident-data-count"><span class="filter-count"></span> selected out of <span class="total-count"></span> records</div>
+            </div>
+            <div class="chart-notes">
+              <div id="accident-data-count"><span class="filter-count"></span> selected out of <span class="total-count"></span> records</div>
+            </div>
           </div>
         </div>
+
+
       </div>
+
 
     </div>
 
@@ -122,7 +144,7 @@
   <link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.css" />
   <script src="http://cdn.leafletjs.com/leaflet-0.7.2/leaflet.js"></script>
   <script type="text/javascript" src="bower_components/leaflet.markercluster/dist/leaflet.markercluster.js"></script>
-
+  <script type="text/javascript" src="assets/lib/leaflet-heat.js"></script>
 
 
   <!-- D3 -->
