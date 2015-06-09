@@ -245,7 +245,7 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         latlngs.push(L.latLng(dataset[i].coordinates[0], dataset[i].coordinates[1]));
     }
 
-    var heat = L.heatLayer(latlngs, {radius: 25}).addTo(accidentMap.map());
+    var heat = L.heatLayer(latlngs, {radius: 25})//.addTo(accidentMap.map());
 
 
     // Add focus
@@ -264,18 +264,26 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         darkUrl = "http://{s}.sm.mapstack.stamen.com/(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/{z}/{x}/{y}.png";
 
 
-
     var osmMap = L.tileLayer(osmUrl, {attribution: osmAttrib}),
         landMap = L.tileLayer(landUrl, {attribution: thunAttrib}),
+        osmMap2 = L.tileLayer('http://{s}.tile2.opencyclemap.org/transport/{z}/{x}/{y}.png', {
+        attribution: '&copy; <a href="http://osm.org/copyright">OpenStreetMap</a> contributors,' +
+            'tiles from <a href="http://www.opencyclemap.org/">OpenCycleMap</a>'
+        }),
         darkMap = L.tileLayer(darkUrl);
 
     var baseLayers = {
         "OSM Mapnik": osmMap,
         "Landscape": landMap,
+        "OSM Modern": osmMap2,
         "Dark": darkMap
     };
 
-    L.control.layers(baseLayers).addTo(accidentMap.map());
+    var overlays = {
+        "Heatmap": heat
+    };
+
+    L.control.layers(baseLayers, overlays).addTo(accidentMap.map());
 
 });
 
