@@ -1,4 +1,5 @@
 'use strict'
+
 var groupname = "dashboard" 
 
 // Create chart objects globally
@@ -230,7 +231,13 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         return this;
     };
 
+
+
+
     dc.renderAll(groupname);
+
+
+    // Add heatmaps
 
     var latlngs = []
 
@@ -240,10 +247,39 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
 
     var heat = L.heatLayer(latlngs, {radius: 25}).addTo(accidentMap.map());
 
+
+    // Add focus
+
     accidentHourChart
     .focusCharts([deathsInjuriesHourChart]);
 
+
+    var osmLink = '<a href="http://openstreetmap.org">OpenStreetMap</a>',
+        thunLink = '<a href="http://thunderforest.com/">Thunderforest</a>';
+
+    var osmUrl = 'http://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png',
+        osmAttrib = '&copy; ' + osmLink + ' Contributors',
+        landUrl = 'http://{s}.tile.thunderforest.com/landscape/{z}/{x}/{y}.png',
+        thunAttrib = '&copy; '+osmLink+' Contributors & '+thunLink,
+        darkUrl = "http://{s}.sm.mapstack.stamen.com/(toner-lite,$fff[difference],$fff[@23],$fff[hsl-saturation@20])/{z}/{x}/{y}.png";
+
+
+
+    var osmMap = L.tileLayer(osmUrl, {attribution: osmAttrib}),
+        landMap = L.tileLayer(landUrl, {attribution: thunAttrib}),
+        darkMap = L.tileLayer(darkUrl);
+
+    var baseLayers = {
+        "OSM Mapnik": osmMap,
+        "Landscape": landMap,
+        "Dark": darkMap
+    };
+
+    L.control.layers(baseLayers).addTo(accidentMap.map());
+
 });
+
+
 
 
         
