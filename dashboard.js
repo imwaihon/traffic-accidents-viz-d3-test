@@ -176,16 +176,59 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
         .margins(C_MARGINS)
         .dimension(hourDimension)
         .group(killedGroup)
+        .brushOn(false)
         .x(d3.scale.linear().domain([0,24]))
-        .elasticX(true)
-        .elasticY(true)
+        // .elasticX(true)
+        // .elasticY(true)
         //.renderlet(colorRenderlet)
-        .xAxisLabel('Hour') // (optional) render an axis label below the x axis
-        .xAxis().ticks(12);
+        .xAxisLabel('Hour'); // (optional) render an axis label below the x axis
 
 
 
 
+    // Multi focus
+    function rangesEqual(range1, range2) {
+        if (!range1 && !range2) {
+            return true;
+        }
+        else if (!range1 || !range2) {
+            return false;
+        }
+        else if (range1.length === 0 && range2.length === 0) {
+            return true;
+        }
+        else if (range1[0].valueOf() === range2[0].valueOf() &&
+            range1[1].valueOf() === range2[1].valueOf()) {
+            return true;
+        }
+        return false;
+    }
+
+    // monkey-patch the first chart with a new function
+    // technically we don't even need to do this, we could just change the 'filtered'
+    // event externally, but this is a bit nicer and could be added to dc.js core someday
+    accidentHourChart.focusCharts = function (chartlist) {
+        if (!arguments.length) {
+            return this._focusCharts;
+        }
+        this._focusCharts = chartlist; // only needed to support the getter above
+        this.on('filtered', function (range_chart) {
+            if (!range_chart.filter()) {
+                dc.events.trigger(function () {
+                    chartlist.forEach(function(focus_chart) {
+                        focus_chart.x().domain(focus_chart.xOriginalDomain());
+                    });
+                });
+            } else chartlist.forEach(function(focus_chart) {
+                if (!rangesEqual(range_chart.filter(), focus_chart.filter())) {
+                    dc.events.trigger(function () {
+                        focus_chart.focus(range_chart.filter());
+                    });
+                }
+            });
+        });
+        return this;
+    };
 
     dc.renderAll(groupname);
 
@@ -196,6 +239,9 @@ d3.csv('../data_sets/2014_accidents.csv', function (error, raw_dataset) {
     }
 
     var heat = L.heatLayer(latlngs, {radius: 25}).addTo(accidentMap.map());
+
+    accidentHourChart
+    .focusCharts([deathsInjuriesHourChart]);
 
 });
 
